@@ -7,24 +7,50 @@ on:
     branches: [ "main", "dev"]
 
 jobs:
-
   test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-
-
+    runs-on: ubuntu-22.04
+    env:
+      MIX_ENV: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - pair:
+              elixir: '1.15.0-dev'
+              otp: 25
+            lint: lint
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Elixir
-      uses: actions/setup-elixir@v1
-      with:
-        elixir-version: '1.15.0-dev'
-        otp-version: '25'
+      - uses: actions/checkout@v2
 
-    - name: Restore dependencies
-      run: mix deps.get
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.pair.otp}}
+          elixir-version: ${{matrix.pair.elixir}}
 
-    - name: Run tests
-      env:
-        MIX_ENV: test
-      run: mix test
+      - uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-${{matrix.pair.elixir}}-${{matrix.pair.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-mix-
+
+      - run: mix deps.get
+
+      - run: mix format --check-formatted
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.unlock --check-unused
+        if: ${{ matrix.lint }}
+
+      - run: mix deps.compile
+
+      - run: mix compile --warnings-as-errors
+        if: ${{ matrix.lint }}
+
+      - run: mix test
+        if: ${{ ! matrix.lint }}
+
+      - run: mix test --warnings-as-errors
+        if: ${{ matrix.lint }}

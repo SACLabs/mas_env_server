@@ -37,6 +37,8 @@ jobs:
 
       - run: mix deps.get
 
+      - run: mix ecto.create
+
       - run: mix deps.compile
 
       - run: mix compile --warnings-as-errors

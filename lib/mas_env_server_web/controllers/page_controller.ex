@@ -6,4 +6,16 @@ defmodule MasEnvServerWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def demand(conn, _params) do
+
+  end
+
+  def mas_push_report(conn, _params) do
+
+  end
+
+  def get_mas_report_by_id(conn, _params) do
+
+  end
 end

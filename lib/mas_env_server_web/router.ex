@@ -6,7 +6,7 @@ defmodule MasEnvServerWeb.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {MasEnvServerWeb.Layouts, :root}
-    plug :protect_from_forgery
+    # plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
 
@@ -18,6 +18,9 @@ defmodule MasEnvServerWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    post "/demand", PageController, :demand_upload
+    post "/push", PageController, :mas_push_src
+    get "/result", PageController, :get_mas_report_by_id
   end
 
   # Other scopes may use custom stacks.

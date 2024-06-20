@@ -10,6 +10,9 @@ defmodule MasEnvServer.Application do
     children = [
       MasEnvServerWeb.Telemetry,
       MasEnvServer.Repo,
+      {MasEnvServer.DemandDb, []},
+      {MasEnvServer.CiRunner, []},
+      {MasEnvServer.ReportDb, []},
       {DNSCluster, query: Application.get_env(:mas_env_server, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: MasEnvServer.PubSub},
       # Start the Finch HTTP client for sending emails

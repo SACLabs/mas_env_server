@@ -11,23 +11,46 @@ defmodule MasEnvServerWeb.PageController do
   def demand_upload(conn, %{"README" => readme_content, "tests" => test_map}) do
     # upload a readme file and a test map
     uuid = UUID.uuid4()
-    # TODO 此处下一个pr完成，将数据存放到env_server的State中
+
+    MasEnvServer.DemandDb.create_demand_record(%{
+      "README" => readme_content,
+      "tests" => test_map,
+      "uuid" => uuid
+    })
+
     conn
     |> put_status(:ok)
     |> json(%{"uuid" => uuid})
   end
 
   def mas_push_src(conn, %{"task_id" => task_id, "content" => content}) do
-    # TODO 下一个pr完成对数据的CI/CD过程
+    %{
+      "result" => %{"code_tree" => code_tree, "code_str" => code_str},
+      "history" => history,
+      "graph" => graph
+    } = content
+
+    # TODO,对于graph和history的处理，暂时不知道怎么做处理，就放在这
+    return_json =
+      case MasEnvServer.DemandDb.has_task_id(task_id) do
+        false ->
+          %{"status" => "unknown task id"}
+
+        _ ->
+          MasEnvServer.CiRunner.run_ci(task_id, code_tree, code_str)
+          %{"status" => "success"}
+      end
+
     conn
     |> put_status(:ok)
-    |> json(%{})
+    |> json(return_json)
   end
 
   def get_mas_report_by_id(conn, %{"task_id" => task_id}) do
-    # TODO 下一个pr完成给定task_id返回对应的CI/CD结果
+    result = MasEnvServer.ReportDb.retrieve_report(task_id)
+
     conn
     |> put_status(:ok)
-    |> json(%{})
+    |> json(result)
   end
 end

@@ -19,6 +19,7 @@ defmodule MasEnvServerWeb.Router do
 
     get "/", PageController, :home
     post "/demand", PageController, :demand_upload
+    get "/pull", PageController, :pull_all_demand
     post "/push", PageController, :mas_push_src
     get "/result", PageController, :get_mas_report_by_id
   end

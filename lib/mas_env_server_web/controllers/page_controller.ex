@@ -46,6 +46,14 @@ defmodule MasEnvServerWeb.PageController do
     |> json(return_json)
   end
 
+  def pull_all_demand(conn, _params) do
+    all_demand_record = MasEnvServer.DemandDb.get_demand_board()
+
+    conn
+    |> put_status(:ok)
+    |> json(all_demand_record)
+  end
+
   def get_mas_report_by_id(conn, %{"task_id" => task_id}) do
     result = MasEnvServer.ReportDb.retrieve_report(task_id)
 

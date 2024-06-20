@@ -27,6 +27,11 @@ defmodule MasEnvServer.CiRunner do
           output_str
       end
 
+    MasEnvServer.DemandDb.update_demand_board(task_id, return_report, %{
+      "tree" => code_tree,
+      "content" => code_str
+    })
+
     MasEnvServer.ReportDb.write_report(task_id, return_report)
     {:noreply, state}
   end
